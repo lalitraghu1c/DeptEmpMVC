@@ -1,0 +1,300 @@
+﻿@model EmpDeptTask.Emp
+
+
+<!DOCTYPE html>
+<html>
+<head>
+    <meta name="viewport" content="width=device-width" />
+    <title>Create</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/knockout/3.5.1/knockout-latest.js"></script>
+    <link href="~/Content/bootstrap.css" rel="stylesheet" />
+    <script src="~/Scripts/jquery-3.7.0.js"></script>
+    <style>
+        .form-group {
+            width: 20vw;
+            height: 15vh;
+            display: flex;
+            flex-direction: column;
+        }
+    </style>
+</head>
+<body>
+    <h2>Department Detail</h2>
+    <hr />
+    <form class="form-horizontal" data-bind="submit: saveForm" style="display:flex;flex-direction:row">
+
+        <div class="form-group">
+            <label class="control-label col-md-2" for="DeptId">DeptId</label>
+            <div class="col-md-10">
+                <input type="text" class="form-control" id="DeptId" data-bind="value: DeptId" />
+                <span class="text-danger" data-bind="text: validationMessages().DeptId"></span>
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label class="control-label col-md-2" for="DeptId">DeptName</label>
+            <div class="col-md-10">
+                <input class="form-control" id="DeptName" data-bind=" value: DeptName">
+                <span class="text-danger" data-bind="text: validationMessages().DeptName"></span>
+            </div>
+        </div>
+
+
+        <div class="form-group">
+            <label class="control-label col-md-2" for="DeptLocation">DeptLocation</label>
+            <div class="col-md-10">
+                <input type="text" class="form-control" id="DeptLocation" data-bind="value: DeptLocation" />
+                <span class="text-danger" data-bind="text: validationMessages().DeptLocation"></span>
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label class="control-label col-md-2" for="DeptJoining">DeptJoining</label>
+            <div class="col-md-10">
+                <input type="date" class="form-control datepicker" id="DeptJoining" data-bind="value: DeptJoining" />
+                <span class="text-danger" data-bind="text: validationMessages().DeptJoining"></span>
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label class="control-label col-md-2" for="DeptLeaving">DeptLeaving</label>
+            <div class="col-md-10">
+                <input type="date" class="form-control datepicker" id="DeptLeaving" data-bind="value: DeptLeaving" />
+                <span class="text-danger" data-bind="text: validationMessages().DeptLeaving"></span>
+            </div>
+        </div>
+
+    </form>
+
+    <h3>Employee Detail</h3>
+    <hr />
+    <form class="form-horizontal" data-bind="submit: saveForm" style="display:flex;flex-direction:row; width:80vw">
+
+        <div class="form-group">
+            <label class="control-label col-md-2" for="EmpId">EmpId</label>
+            <div class="col-md-10">
+                <input type="text" class="form-control" id="EmpId" data-bind="value: EmpId" />
+                <span class="text-danger" data-bind="text: validationMessages().EmpId"></span>
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label class="control-label col-md-2" for="EmpName">EmpName</label>
+            <div class="col-md-10">
+                <input type="text" class="form-control" id="EmpName" data-bind="value: EmpName" />
+                <span class="text-danger" data-bind="text: validationMessages().EmpName"></span>
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label class="control-label col-md-2" for="EmpCity">EmpCity</label>
+            <div class="col-md-10">
+                <input type="text" class="form-control" id="EmpCity" data-bind="value: EmpCity" />
+                <span class="text-danger" data-bind="text: validationMessages().EmpCity"></span>
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label class="control-label col-md-2" for="EmpState">EmpState</label>
+            <div class="col-md-10">
+                <input type="text" class="form-control" id="EmpState" data-bind="value: EmpState" />
+                <span class="text-danger" data-bind="text: validationMessages().EmpState"></span>
+            </div>
+        </div>
+
+        @*<div class="form-group">
+                <label class="control-label col-md-2" for="DeptId">DeptName</label>
+                <div class="col-md-10">
+                    <input class="form-control" id="DeptId" data-bind="value: DeptName">
+                    <span class="text-danger" data-bind="text: validationMessages().DeptId"></span>
+                </div>
+            </div>*@
+
+    </form>
+    <div style="margin-left:85%;margin-top:-8.5%">
+        <div class="col-md-offset-2 col-md-10" style="position:relative;margin-top:5px;margin-right:200px;">
+            <input type="submit" value="Add" class="btn btn-primary" data-bind="click: saveForm" />
+        </div>
+    </div>
+    <br />
+    <br />
+    <br />
+    <hr />
+
+    <div class="row col-md-12">
+        <div class="table-responsive">
+            <table class="table table-bordered">
+                <thead>
+                    <tr>
+                        <th>EmpId</th>
+                        <th>EmpName</th>
+                        <th>EmpCity</th>
+                        <th>EmpState</th>
+                        @*<th>DeptId</th>*@
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody data-bind="foreach: employees">
+                    <tr>
+                        <td data-bind="text: EmpId"></td>
+                        <td data-bind="text: EmpName"></td>
+                        <td data-bind="text: EmpCity"></td>
+                        <td data-bind="text: EmpState"></td>
+                        @*<td data-bind="text: DeptId"></td>*@
+                        <td>
+                            <button class="btn btn-sm btn-primary" data-bind="click: $root.editEmployee">Edit</button>
+                            <button class="btn btn-sm btn-danger" data-bind="click: $root.deleteEmployee">Delete</button>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <div class="buttons" style="width:20vw;height:10vh;display:flex;flex-direction:row;justify-content:space-between">
+        <div class="col-md-offset-2 col-md-10">
+            <input type="submit" value="Save" class="btn btn-primary" data-bind="click:uploadForm" />
+        </div>
+        <div class="col-md-offset-2 col-md-10">
+            <button type="button" class="btn btn-primary" onclick="window.print()" title=" print">Print</button>
+        </div>
+        <div class="col-md-offset-2 col-md-10">
+            <a class="btn btn-primary" href="~/Depts/Index">Cancel</a>
+        </div>
+    </div>
+
+    <script>
+
+        function EmployeeViewModel() {
+            var self = this;
+
+            self.EmpId = ko.observable();
+            self.EmpName = ko.observable();
+            self.EmpCity = ko.observable();
+            self.EmpState = ko.observable();
+            self.DeptId = ko.observable();
+            self.DeptName = ko.observable();
+            self.DeptLocation = ko.observable();
+            self.DeptJoining = ko.observable();
+            self.DeptLeaving = ko.observable();
+            self.validationMessages = ko.observable({});
+
+            self.employees = ko.observableArray([]);
+
+            // Function to save the form
+            self.saveForm = function () {
+                var errors = {};
+
+                if (!self.EmpId()) {
+                    errors.EmpId = "Emp Id is required.";
+                }
+
+                if (!self.EmpName()) {
+                    errors.EmpName = "Emp Name is required.";
+                }
+
+                if (!self.EmpCity()) {
+                    errors.EmpCity = "Emp City is required.";
+                }
+
+                if (!self.EmpState()) {
+                    errors.EmpState = "Emp State is required.";
+                }
+
+
+                self.validationMessages(errors);
+
+                if (Object.keys(errors).length > 0) {
+                    return false;
+                }
+
+                var employee = {
+                    EmpId: self.EmpId(),
+                    EmpName: self.EmpName(),
+                    EmpCity: self.EmpCity(),
+                    EmpState: self.EmpState(),
+                }
+
+                self.employees.push(employee);
+
+                self.EmpId('');
+                self.EmpName('');
+                self.EmpCity('');
+                self.EmpState('');
+            }
+
+
+            self.editEmployee = function (employee) {
+                self.EmpId(employee.EmpId);
+                self.EmpName(employee.EmpName);
+                self.EmpCity(employee.EmpCity);
+                self.EmpState(employee.EmpState);
+
+                self.employees.pop(employee);
+            };
+
+            self.deleteEmployee = function (employee) {
+                self.employees.remove(employee);
+            };
+
+            self.uploadForm = function () {
+                var errors = {};
+
+                if (!self.DeptId()) {
+                    errors.DeptId = "Dept Id is required.";
+                }
+
+                if (!self.DeptName()) {
+                    errors.DeptName = "Dept Name is required.";
+                }
+
+                if (!self.DeptLocation()) {
+                    errors.DeptLocation = "Dept Location is required.";
+                }
+
+                if (!self.DeptJoining()) {
+                    errors.DeptJoining = "Dept Joining is required.";
+                }
+
+                if (!self.DeptLeaving()) {
+                    errors.DeptLeaving = "Dept Leaving is required.";
+                }
+
+                self.validationMessages(errors);
+
+                if (Object.keys(errors).length > 0) {
+                    return false;
+                }
+
+                var saveToData = {
+                    EmpVM: self.employees(),
+                    DeptId: self.DeptId(),
+                    DeptName: self.DeptName(),
+                    DeptLocation: self.DeptLocation(),
+                    DeptJoining: self.DeptJoining(),
+                    DeptLeaving: self.DeptLeaving()
+                }
+                
+                self.loadDept = function () {
+                    $.ajax({
+                        url: '/Emps/SaveEmp',
+                        type: 'POST',
+                        data: saveToData,
+                        dataType: 'json',
+                        success: function (data) {
+                            console.log("Successfully")
+                        },
+                        error: function (xhr, status, error) {
+                            console.log(error);
+                        }
+                    });
+                };
+                self.loadDept();
+            }
+        }
+
+        var viewModel = new EmployeeViewModel();
+        ko.applyBindings(viewModel);
+    </script>
+</body>
+</html>

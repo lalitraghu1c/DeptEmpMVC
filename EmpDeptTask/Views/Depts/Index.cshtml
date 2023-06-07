@@ -1,0 +1,69 @@
+﻿
+
+<div id="master_index">
+    <br />
+    <div class="col-md-offset-2 col-md-10" style="position:relative;width:10vw">
+        <button type="button" class="btn btn-primary" id="createNewLink">Create New</button>
+    </div>
+
+
+    <table class="table table-bordered">
+        <thead>
+            <tr>
+                <th>Department Name</th>
+                <th>Department Location</th>
+                <th>Department Joining</th>
+                <th>Department Leaving</th>
+            </tr>
+        </thead>
+        <tbody data-bind="foreach: departments">
+            <tr>
+                <td><a data-bind="attr: { href: '/Depts/Edit?id=' + DeptId }, text: DeptName"></a></td>
+                <td data-bind="text: DeptLocation"></td>
+                <td data-bind="text: DeptJoining"></td>
+                <td data-bind="text: DeptLeaving"></td>
+            </tr>
+        </tbody>
+    </table>
+</div>
+
+@section scripts{
+    <script src="~/Scripts/knockout-3.5.1.js"></script>
+    <script>
+
+        function DepartmentViewModel() {
+            var self = this;
+            self.departments = ko.observableArray([]);
+
+            self.loadDepartments = function () {
+                $.ajax({
+                    url: '/Depts/fetchList',
+                    type: 'GET',
+                    contentType: "application/json; charset=utf-8",
+                    dataType: "json",
+                    success: function (data) {
+                        self.departments(data);
+                        //ko.mapping.fromJSON;
+                    },
+                    error: function (error) {
+                        console.log(error);
+                    }
+                });
+            };
+
+            self.createNew = function () {
+                window.location.href = '/Emps/Create';
+            };
+
+            self.loadDepartments();
+        }
+
+        var viewModel = new DepartmentViewModel();
+        ko.applyBindings(viewModel, document.getElementById("master_index"));
+
+        document.getElementById('createNewLink').addEventListener('click', viewModel.createNew);
+
+
+
+    </script>
+}

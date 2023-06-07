@@ -1,0 +1,338 @@
+﻿
+<!DOCTYPE html>
+
+<html>
+<head>
+    <meta name="viewport" content="width=device-width" />
+    <title>Edit</title>
+    <link href="~/Content/bootstrap.css" rel="stylesheet" />
+    <script src="~/Scripts/knockout-3.5.1.js"></script>
+    <script src="~/Scripts/jquery-3.7.0.min.js"></script>
+    <style>
+        .form-group {
+            width: 20vw;
+            height: 15vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .control-label {
+            width: 80%;
+            position: relative;
+            display: flex;
+            flex-direction: row;
+            justify-content: flex-start;
+        }
+    </style>
+
+</head>
+<body>
+    <h2>Department Detail</h2>
+    <hr />
+    <form class="form-horizontal" style="display:flex;flex-direction:row;width:85vw">
+        <div class="form-group">
+            <label class="control-label col-md-2" for="deptId">Dept Id</label>
+            <div class="col-md-10">
+                <input type="text" class="form-control" id="deptId" data-bind="value: deptId" readonly />
+                <span class="text-danger" data-bind="text: validationMessages.deptId"></span>
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label class="control-label col-md-2" for="deptName">Dept Name</label>
+            <div class="col-md-10">
+                <input type="text" class="form-control" id="deptName" data-bind="value: deptName" />
+                <span class="text-danger" data-bind="text: validationMessages.deptName"></span>
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label class="control-label col-md-2" for="deptLocation">Dept Location</label>
+            <div class="col-md-10">
+                <input type="text" class="form-control" id="deptLocation" data-bind="value: deptLocation" />
+                <span class="text-danger" data-bind="text: validationMessages.deptLocation"></span>
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label class="control-label col-md-2" for="deptJoining">Dept Joining</label>
+            <div class="col-md-10">
+                <input type="date" class="form-control" id="deptJoining" data-bind="value: deptJoining" />
+                <span class="text-danger" data-bind="text: validationMessages.deptJoining"></span>
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label class="control-label col-md-2" for="deptLeaving">Dept Leaving</label>
+            <div class="col-md-10">
+                <input type="date" class="form-control" id="deptLeaving" data-bind="value: deptLeaving" />
+                <span class="text-danger" data-bind="text: validationMessages.deptLeaving"></span>
+            </div>
+        </div>
+    </form>
+    <h3>Employee Detail</h3>
+    <hr />
+    <form class="form-horizontal" data-bind="submit: saveForm" style="display:flex;flex-direction:row; width:80vw">
+
+        <div class="form-group">
+            <label class="control-label col-md-2" for="EmpId">EmpId</label>
+            <div class="col-md-10">
+                <input type="text" class="form-control" id="EmpId" data-bind="value: EmpId" />
+                <span class="text-danger" data-bind="text: validationMessages().EmpId"></span>
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label class="control-label col-md-2" for="EmpName">EmpName</label>
+            <div class="col-md-10">
+                <input type="text" class="form-control" id="EmpName" data-bind="value: EmpName" />
+                <span class="text-danger" data-bind="text: validationMessages().EmpName"></span>
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label class="control-label col-md-2" for="EmpCity">EmpCity</label>
+            <div class="col-md-10">
+                <input type="text" class="form-control" id="EmpCity" data-bind="value: EmpCity" />
+                <span class="text-danger" data-bind="text: validationMessages().EmpCity"></span>
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label class="control-label col-md-2" for="EmpState">EmpState</label>
+            <div class="col-md-10">
+                <input type="text" class="form-control" id="EmpState" data-bind="value: EmpState" />
+                <span class="text-danger" data-bind="text: validationMessages().EmpState"></span>
+            </div>
+        </div>
+    </form>
+    <div style="margin-left:85%;margin-top:-8.5%">
+        <div class="col-md-offset-2 col-md-10" style="position:relative;margin-top:5px;margin-right:200px;">
+            <input type="submit" value="Add" class="btn btn-primary" data-bind="click: saveForm" />
+        </div>
+    </div>
+    <br />
+    <br />
+    <br />
+    <hr />
+
+    <div class="row col-md-12">
+        <div class="table-responsive">
+            <table class="table table-bordered">
+                <thead>
+                    <tr>
+                        <th>EmpId</th>
+                        <th>EmpName</th>
+                        <th>EmpCity</th>
+                        <th>EmpState</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody data-bind="foreach: employees">
+                    <tr>
+                        <td data-bind="text: EmpId"></td>
+                        <td data-bind="text: EmpName"></td>
+                        <td data-bind="text: EmpCity"></td>
+                        <td data-bind="text: EmpState"></td>
+                        <td>
+                            <button class="btn btn-sm btn-primary" data-bind="click: $root.editEmployee">Edit</button>
+                            <button class="btn btn-sm btn-danger" data-bind="click: $root.deleteEmployee">Delete</button>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+    <div class="buttons" style="width:20vw;height:10vh;display:flex;flex-direction:row;justify-content:space-between">
+        <div class="col-md-offset-2 col-md-10">
+            <button type="button" value="Save" class="btn btn-primary" data-bind="click:uploadForm">Save</button>
+        </div>
+        <div class="col-md-offset-2 col-md-10">
+            <button type="button" class="btn btn-primary" onclick="window.print()" title=" print">Print</button>
+        </div>
+        <div class="col-md-offset-2 col-md-10">
+            <a class="btn btn-primary" href="Index">Cancel</a>
+        </div>
+    </div>
+
+    <div>
+        <a href="~/Depts/Index">Back to List</a>
+    </div>
+
+    <script>
+        function DeptViewModel() {
+            var self = this;
+
+            self.deptId = ko.observable();
+            self.deptName = ko.observable();
+            self.deptLocation = ko.observable();
+            self.deptJoining = ko.observable();
+            self.deptLeaving = ko.observable();
+            self.EmpId = ko.observable();
+            self.EmpName = ko.observable();
+            self.EmpCity = ko.observable();
+            self.EmpState = ko.observable();
+            self.validationMessages = ko.observable({});
+
+            self.employees = ko.observableArray([]);
+
+            // Function to save the form
+            self.saveForm = function () {
+                var errors = {};
+
+                if (!self.EmpId()) {
+                    errors.EmpId = "Emp Id is required.";
+                }
+
+                if (!self.EmpName()) {
+                    errors.EmpName = "Emp Name is required.";
+                }
+
+                if (!self.EmpCity()) {
+                    errors.EmpCity = "Emp City is required.";
+                }
+
+                if (!self.EmpState()) {
+                    errors.EmpState = "Emp State is required.";
+                }
+
+
+                self.validationMessages(errors);
+
+                if (Object.keys(errors).length > 0) {
+                    return false;
+                }
+
+                var employee = {
+                    EmpId: self.EmpId(),
+                    EmpName: self.EmpName(),
+                    EmpCity: self.EmpCity(),
+                    EmpState: self.EmpState(),
+                }
+
+                self.employees.push(employee);
+
+                self.EmpId('');
+                self.EmpName('');
+                self.EmpCity('');
+                self.EmpState('');
+            }
+
+
+            self.editEmployee = function (employee) {
+                self.EmpId(employee.EmpId);
+                self.EmpName(employee.EmpName);
+                self.EmpCity(employee.EmpCity);
+                self.EmpState(employee.EmpState);
+
+                self.employees.pop(employee);
+            };
+
+
+            self.deleteEmployee = function (employee) {
+                self.employees.remove(employee);
+            };
+
+            self.uploadForm = function (data,event) {
+                var res = data.employees;
+                var errors = {};
+
+                if (!self.deptId()) {
+                    errors.deptId = "Dept Id is required.";
+                }
+
+                if (!self.deptName()) {
+                    errors.deptName = "Dept Name is required.";
+                }
+
+                if (!self.deptLocation()) {
+                    errors.deptLocation = "Dept Location is required.";
+                }
+
+                if (!self.deptJoining()) {
+                    errors.deptJoining = "Dept Joining is required.";
+                }
+
+                if (!self.deptLeaving()) {
+                    errors.deptLeaving = "Dept Leaving is required.";
+                }
+
+                self.validationMessages(errors);
+
+                if (Object.keys(errors).length > 0) {
+                    return false;
+                }
+
+                var data = {
+                    deptId: data.deptId,
+                    deptName: data.deptName,
+                    deptLocation: data.deptLocation,
+                    deptJoining: data.deptJoining,
+                    deptLeaving: data.deptLeaving,
+                    EmpVM: self.employees()
+                }
+                self.loadDept = function () {
+                    $.ajax({
+                        url: '/Depts/SaveDept',
+                        type: 'POST',
+                        data: data,
+                        dataType: 'json',
+                        success: function (data) {
+                            alert("Successfully")
+                        },
+                        error: function (xhr, status, error) {
+                            console.log(error);
+                        }
+                    });
+                };
+                self.loadDept();
+            }
+            self.setData = function (data) {
+                self.deptId(data.DeptId);
+                self.deptName(data.DeptName);
+                self.deptLocation(data.DeptLocation);
+                self.deptJoining(data.DeptJoining);
+                self.deptLeaving(data.DeptLeaving);
+
+                // Map employee data to observables
+                var mappedEmployees = data.EmpVM.map(function (emp) {
+                    return {
+                        EmpId: ko.observable(emp.EmpId),
+                        EmpName: ko.observable(emp.EmpName),
+                        EmpCity: ko.observable(emp.EmpCity),
+                        EmpState: ko.observable(emp.EmpState)
+                    };
+                });
+
+                self.employees(mappedEmployees);
+            };
+
+        }
+        var viewModel = new DeptViewModel();
+        ko.applyBindings(viewModel);
+
+
+        $(document).ready(function () {
+
+            var res = {
+                id: @ViewBag.id,
+            };
+
+
+            $.ajax({
+                url: '/Depts/GetData',
+                type: 'POST',
+                data: res,
+                success: function (response) {
+                    console.log(response)
+                    viewModel.setData(response);
+                    // viewModel.data(response);
+                },
+                error: function (error) {
+                    console.log(error);
+                }
+            });
+        });
+    </script>
+</body>
+</html>
