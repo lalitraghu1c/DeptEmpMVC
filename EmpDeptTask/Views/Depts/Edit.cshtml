@@ -8,6 +8,8 @@
     <link href="~/Content/bootstrap.css" rel="stylesheet" />
     <script src="~/Scripts/knockout-3.5.1.js"></script>
     <script src="~/Scripts/jquery-3.7.0.min.js"></script>
+    <script src="https://unpkg.com/exceljs/dist/exceljs.min.js"></script>
+
     <style>
         .form-group {
             width: 20vw;
@@ -106,7 +108,7 @@
             </div>
         </div>
     </form>
-    <div style="margin-left:85%;margin-top:-8.5%">
+    <div style="margin-left:85%;margin-top:-8.2%">
         <div class="col-md-offset-2 col-md-10" style="position:relative;margin-top:5px;margin-right:200px;">
             <input type="submit" value="Add" class="btn btn-primary" data-bind="click: saveForm" />
         </div>
@@ -150,13 +152,12 @@
         <div class="col-md-offset-2 col-md-10">
             <button type="button" class="btn btn-primary" onclick="window.print()" title=" print">Print</button>
         </div>
+        @*<div class="col-md-offset-2 col-md-10">
+                <button type="button" class="btn btn-primary" onclick="exportToExcel()">Export</button>
+            </div>*@
         <div class="col-md-offset-2 col-md-10">
             <a class="btn btn-primary" href="Index">Cancel</a>
         </div>
-    </div>
-
-    <div>
-        <a href="~/Depts/Index">Back to List</a>
     </div>
 
     <script>
@@ -185,7 +186,15 @@
                 }
 
                 if (!self.EmpName()) {
-                    errors.EmpName = "Emp Name is required.";
+                    errors.EmpName = "Employee name is required.";
+                } else {
+                    // Check if the employee name already exists in the table
+                    var existingEmployee = ko.utils.arrayFirst(self.employees(), function (employee) {
+                        return employee.EmpName() === self.EmpName();
+                    });
+                    if (existingEmployee) {
+                        errors.EmpName = "Employee name must be unique.";
+                    }
                 }
 
                 if (!self.EmpCity()) {
@@ -220,12 +229,12 @@
 
 
             self.editEmployee = function (employee) {
-                self.EmpId(employee.EmpId);
-                self.EmpName(employee.EmpName);
-                self.EmpCity(employee.EmpCity);
-                self.EmpState(employee.EmpState);
+                self.EmpId(employee.EmpId());
+                self.EmpName(employee.EmpName());
+                self.EmpCity(employee.EmpCity());
+                self.EmpState(employee.EmpState());
 
-                self.employees.pop(employee);
+                self.employees.remove(employee);
             };
 
 
@@ -279,6 +288,7 @@
                         dataType: 'json',
                         success: function (data) {
                             alert("Successfully")
+                            window.location.href = '/Depts/Index';
                         },
                         error: function (xhr, status, error) {
                             console.log(error);
@@ -326,7 +336,6 @@
                 success: function (response) {
                     console.log(response)
                     viewModel.setData(response);
-                    // viewModel.data(response);
                 },
                 error: function (error) {
                     console.log(error);

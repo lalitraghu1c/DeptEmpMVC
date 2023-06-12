@@ -9,6 +9,8 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/knockout/3.5.1/knockout-latest.js"></script>
     <link href="~/Content/bootstrap.css" rel="stylesheet" />
     <script src="~/Scripts/jquery-3.7.0.js"></script>
+    <script src="https://unpkg.com/exceljs/dist/exceljs.min.js"></script>
+
     <style>
         .form-group {
             width: 20vw;
@@ -27,7 +29,7 @@
             <label class="control-label col-md-2" for="DeptId">DeptId</label>
             <div class="col-md-10">
                 <input type="text" class="form-control" id="DeptId" data-bind="value: DeptId" />
-                <span class="text-danger" data-bind="text: validationMessages().DeptId"></span>
+                <span class="text-danger" data-bind="text: validationMessages().DeptId" style="color: red;"></span>
             </div>
         </div>
 
@@ -35,7 +37,7 @@
             <label class="control-label col-md-2" for="DeptId">DeptName</label>
             <div class="col-md-10">
                 <input class="form-control" id="DeptName" data-bind=" value: DeptName">
-                <span class="text-danger" data-bind="text: validationMessages().DeptName"></span>
+                <span class="text-danger" data-bind="text: validationMessages().DeptName" style="color: red;"></span>
             </div>
         </div>
 
@@ -44,7 +46,7 @@
             <label class="control-label col-md-2" for="DeptLocation">DeptLocation</label>
             <div class="col-md-10">
                 <input type="text" class="form-control" id="DeptLocation" data-bind="value: DeptLocation" />
-                <span class="text-danger" data-bind="text: validationMessages().DeptLocation"></span>
+                <span class="text-danger" data-bind="text: validationMessages().DeptLocation" style="color: red;"></span>
             </div>
         </div>
 
@@ -52,7 +54,7 @@
             <label class="control-label col-md-2" for="DeptJoining">DeptJoining</label>
             <div class="col-md-10">
                 <input type="date" class="form-control datepicker" id="DeptJoining" data-bind="value: DeptJoining" />
-                <span class="text-danger" data-bind="text: validationMessages().DeptJoining"></span>
+                <span class="text-danger" data-bind="text: validationMessages().DeptJoining" style="color: red;"></span>
             </div>
         </div>
 
@@ -60,7 +62,7 @@
             <label class="control-label col-md-2" for="DeptLeaving">DeptLeaving</label>
             <div class="col-md-10">
                 <input type="date" class="form-control datepicker" id="DeptLeaving" data-bind="value: DeptLeaving" />
-                <span class="text-danger" data-bind="text: validationMessages().DeptLeaving"></span>
+                <span class="text-danger" data-bind="text: validationMessages().DeptLeaving" style="color: red;"></span>
             </div>
         </div>
 
@@ -74,7 +76,7 @@
             <label class="control-label col-md-2" for="EmpId">EmpId</label>
             <div class="col-md-10">
                 <input type="text" class="form-control" id="EmpId" data-bind="value: EmpId" />
-                <span class="text-danger" data-bind="text: validationMessages().EmpId"></span>
+                <span class="text-danger" data-bind="text: validationMessages().EmpId" style="color: red;"></span>
             </div>
         </div>
 
@@ -82,7 +84,7 @@
             <label class="control-label col-md-2" for="EmpName">EmpName</label>
             <div class="col-md-10">
                 <input type="text" class="form-control" id="EmpName" data-bind="value: EmpName" />
-                <span class="text-danger" data-bind="text: validationMessages().EmpName"></span>
+                <span class="text-danger" data-bind="text: validationMessages().EmpName" id="empNameValidationMessage" style="color: red;"></span>
             </div>
         </div>
 
@@ -90,7 +92,7 @@
             <label class="control-label col-md-2" for="EmpCity">EmpCity</label>
             <div class="col-md-10">
                 <input type="text" class="form-control" id="EmpCity" data-bind="value: EmpCity" />
-                <span class="text-danger" data-bind="text: validationMessages().EmpCity"></span>
+                <span class="text-danger" data-bind="text: validationMessages().EmpCity" style="color: red;"></span>
             </div>
         </div>
 
@@ -98,20 +100,20 @@
             <label class="control-label col-md-2" for="EmpState">EmpState</label>
             <div class="col-md-10">
                 <input type="text" class="form-control" id="EmpState" data-bind="value: EmpState" />
-                <span class="text-danger" data-bind="text: validationMessages().EmpState"></span>
+                <span class="text-danger" data-bind="text: validationMessages().EmpState" style="color: red;"></span>
             </div>
         </div>
 
         @*<div class="form-group">
-                <label class="control-label col-md-2" for="DeptId">DeptName</label>
+                <label class="control-label col-md-2" for="deptid">deptname</label>
                 <div class="col-md-10">
-                    <input class="form-control" id="DeptId" data-bind="value: DeptName">
-                    <span class="text-danger" data-bind="text: validationMessages().DeptId"></span>
+                    <input class="form-control" id="deptid" data-bind="value: deptname">
+                    <span class="text-danger" data-bind="text: validationmessages().deptid"></span>
                 </div>
             </div>*@
 
     </form>
-    <div style="margin-left:85%;margin-top:-8.5%">
+    <div style="margin-left:85%;margin-top:-8.2%">
         <div class="col-md-offset-2 col-md-10" style="position:relative;margin-top:5px;margin-right:200px;">
             <input type="submit" value="Add" class="btn btn-primary" data-bind="click: saveForm" />
         </div>
@@ -190,7 +192,15 @@
                 }
 
                 if (!self.EmpName()) {
-                    errors.EmpName = "Emp Name is required.";
+                    errors.EmpName = "Emp name is required.";
+                } else {
+                    // Check if the employee name already exists in the table
+                    var existingEmployee = ko.utils.arrayFirst(self.employees(), function (employee) {
+                        return employee.EmpName === self.EmpName();
+                    });
+                    if (existingEmployee) {
+                        errors.EmpName = "Emp name must be unique.";
+                    }
                 }
 
                 if (!self.EmpCity()) {
@@ -260,6 +270,10 @@
                     errors.DeptLeaving = "Dept Leaving is required.";
                 }
 
+                if (self.employees().length === 0) {
+                    alert(errors.Employees = "At least one employee entry is required.");
+                }
+
                 self.validationMessages(errors);
 
                 if (Object.keys(errors).length > 0) {
@@ -274,7 +288,7 @@
                     DeptJoining: self.DeptJoining(),
                     DeptLeaving: self.DeptLeaving()
                 }
-                
+
                 self.loadDept = function () {
                     $.ajax({
                         url: '/Emps/SaveEmp',
@@ -282,7 +296,8 @@
                         data: saveToData,
                         dataType: 'json',
                         success: function (data) {
-                            console.log("Successfully")
+                            alert("Successfully")
+                            window.location.href = '/Depts/Index';
                         },
                         error: function (xhr, status, error) {
                             console.log(error);
@@ -295,6 +310,29 @@
 
         var viewModel = new EmployeeViewModel();
         ko.applyBindings(viewModel);
+
+        $(document).ready(function () {
+            $('#EmpName').blur(function () {
+                var empName = $(this).val();
+
+                $.ajax({
+                    url: '@Url.Action("CheckEmployeeNameExists", "Emps")',
+                    type: 'GET',
+                    data: { empName: empName },
+                    success: function (result) {
+                        if (result.exists) {
+                            alert('Employee name already exists in the ' + result.department + ' department.');
+                        } else {
+                            $('#empNameValidationMessage').text('');
+                        }
+                    },
+                    error: function () {
+                        $('#empNameValidationMessage').text('');
+                    }
+                });
+            });
+        });
+
     </script>
 </body>
 </html>

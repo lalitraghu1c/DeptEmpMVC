@@ -7,6 +7,10 @@ using System.Net;
 using System.Web;
 using System.Web.Mvc;
 using EmpDeptTask;
+using System.Web.UI.WebControls;
+using System.IO;
+using System.Web.UI;
+
 
 namespace EmpDeptTask.Controllers
 {
@@ -14,10 +18,125 @@ namespace EmpDeptTask.Controllers
     {
         private EmpDeptEntities db = new EmpDeptEntities();
 
+        //Get: Exprot to Excel through server side
+
+        public ActionResult ExportToExcel()
+        {
+            var departments = db.Depts.ToList();
+
+            var grid = new GridView();
+            grid.DataSource = departments.Select(d => new
+            {
+                DeptId = d.DeptId,
+                DeptName = d.DeptName,
+                DeptLocation = d.DeptLocation,
+                DeptJoining = d.DeptJoining,
+                DeptLeaving = d.DeptLeaving
+            });
+            grid.DataBind();
+
+            Response.ClearContent();
+            Response.Buffer = true;
+            Response.AddHeader("content-disposition", "attachment; filename=DepartmentData.xls");
+            Response.ContentType = "application/ms-excel";
+
+            Response.Charset = "";
+            StringWriter sw = new StringWriter();
+            HtmlTextWriter htw = new HtmlTextWriter(sw);
+
+            grid.RenderControl(htw);
+
+            Response.Output.Write(sw.ToString());
+            Response.Flush();
+            Response.End();
+
+            return RedirectToAction("Index");
+        }
+
+
+        public ActionResult GetServerData(JqueryDatatableParam param)
+        {
+            List<DeptVM> employees = new List<DeptVM>();
+            employees = (from S in db.Depts.AsNoTracking().AsEnumerable()
+                         select new DeptVM
+                         {
+                             DeptId = S.DeptId,
+                             DeptName = S.DeptName,
+                             DeptLocation = S.DeptLocation,
+                             DeptJoining = S.DeptJoining,
+                             DeptLeaving = S.DeptLeaving
+                         }).ToList();
+
+            // Filtering
+            if (!string.IsNullOrEmpty(param.sSearch))
+            {
+                employees = employees.Where(x =>
+                    x.DeptName.ToLower().Contains(param.sSearch.ToLower()) ||
+                    x.DeptLocation.ToLower().Contains(param.sSearch.ToLower()) ||
+                    x.DeptJoining.ToLower().Contains(param.sSearch.ToLower()) ||
+                    x.DeptLeaving.ToString().Contains(param.sSearch.ToLower())
+                ).ToList();
+            }
+
+            // Sorting
+            var sortColumnIndex = Convert.ToInt32(HttpContext.Request["order[0][column]"]);
+            var sortDirection = HttpContext.Request["order[0][dir]"];
+
+            Func<DeptVM, string> orderingFunction = null;
+
+            switch (sortColumnIndex)
+            {
+                case 0:
+                    orderingFunction = e => e.DeptName;
+                    break;
+                case 1:
+                    orderingFunction = e => e.DeptLocation;
+                    break;
+                case 2:
+                    orderingFunction = e => e.DeptJoining;
+                    break;
+                case 3:
+                    orderingFunction = e => e.DeptLeaving;
+                    break;
+                default:
+                    orderingFunction = e => e.DeptName;
+                    break;
+            }
+
+            if (sortDirection == "desc")
+                employees = employees.OrderByDescending(orderingFunction).ToList();
+            else
+                employees = employees.OrderBy(orderingFunction).ToList();
+
+            // Pagination
+            var displayResult = employees.Skip(param.start).Take(param.length).ToList();
+
+            return Json(new
+            {
+                draw = param.draw,
+                recordsTotal = employees.Count,
+                recordsFiltered = employees.Count,
+                data = displayResult
+            }, JsonRequestBehavior.AllowGet);
+        }
+
+
+
         // GET: Depts
         public ActionResult Index()
         {
-            return View();
+            List<DeptVM> getList = new List<DeptVM>();
+            getList = (from S in db.Depts.AsNoTracking().AsEnumerable()
+                       select new DeptVM
+                       {
+                           DeptId = S.DeptId,
+                           DeptName = S.DeptName,
+                           DeptLocation = S.DeptLocation,
+                           DeptJoining = S.DeptJoining,
+                           DeptLeaving = S.DeptLeaving
+                       }).ToList();
+
+            return View(getList);
         }
 
         [HttpPost]
@@ -36,7 +155,7 @@ namespace EmpDeptTask.Controllers
                     db.Entry(deparment).State = EntityState.Modified;
 
                     var empCount = db.Emps.Where(x => x.DeptId == data.DeptId).ToList();
-                    if (empCount.Count > 0)
+                    if (empCount.Count >= 0)
                     {
                         db.Emps.RemoveRange(empCount);
 
@@ -53,26 +172,6 @@ namespace EmpDeptTask.Controllers
                     }
                     db.SaveChanges();
                 }
-
-                //Dept deparment = new Dept();
-                //deparment.DeptId = data.DeptId;
-                //deparment.DeptName = data.DeptName;
-                //deparment.DeptLocation = data.DeptLocation;
-                //deparment.DeptJoining = data.DeptJoining;
-                //deparment.DeptLeaving = data.DeptLeaving;
-
-                //deparment.Emps = data.EmpVM.Select(x => new Emp
-                //{
-                //    EmpId = x.EmpId,
-                //    EmpName = x.EmpName,
-                //    EmpCity = x.EmpCity,
-                //    EmpState = x.EmpState,
-                //    DeptId = deparment.DeptId,
-                //}).ToList();
-
-                //db.Emps.AddRange(deparment.Emps);
-                //db.Entry(deparment).State = EntityState.Modified;
-                //db.SaveChanges();
 
                 data.StatueCode = "200";
                 data.ResponseMessage = "employee updated successfully";
@@ -105,24 +204,6 @@ namespace EmpDeptTask.Controllers
                               }).ToList();
 
             return Json(deptData, JsonRequestBehavior.AllowGet);
-        }
-
-
-        [HttpGet]
-        public ActionResult fetchList()
-        {
-            List<Dept> getList = new List<Dept>();
-            getList = db.Depts.ToList();
-            //selecting the desired columns
-            var subCategoryToReturn = getList.Select(S => new
-            {
-                DeptId = S.DeptId,
-                DeptName = S.DeptName,
-                DeptLocation = S.DeptLocation,
-                DeptJoining = S.DeptJoining,
-                DeptLeaving = S.DeptLeaving
-            });
-            return Json(subCategoryToReturn, JsonRequestBehavior.AllowGet);
         }
 
         // GET: Depts/Details/5
@@ -197,31 +278,65 @@ namespace EmpDeptTask.Controllers
         }
 
         // GET: Depts/Delete/5
-        public ActionResult Delete(int? id)
+        [HttpPost]
+        public ActionResult Delete(int id)
         {
-            if (id == null)
-            {
-                return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
-            }
             Dept dept = db.Depts.Find(id);
-            if (dept == null)
+
+            var department = GetDepartmentById(dept, id);
+            if (department == null)
             {
                 return HttpNotFound();
             }
-            return View(dept);
-        }
 
-        // POST: Depts/Delete/5
-        [HttpPost, ActionName("Delete")]
-        [ValidateAntiForgeryToken]
-        public ActionResult DeleteConfirmed(int id)
-        {
-            Dept dept = db.Depts.Find(id);
+            if (HasEmployees(department))
+            {
+                return Content("Cannot delete the department.");
+            }
+
             db.Depts.Remove(dept);
             db.SaveChanges();
             return RedirectToAction("Index");
         }
+        private Dept GetDepartmentById(Dept dept, int id)
+        {
+            var departments = GetDepartmentsFromDatabase();
+            return departments.FirstOrDefault(d => d.DeptId == id);
+        }
 
+        private bool HasEmployees(Dept department)
+        {
+
+            return db.Emps.Any(e => e.DeptId == department.DeptId);
+
+        }
+        private List<Dept> GetDepartmentsFromDatabase()
+        {
+
+            return db.Depts.ToList();
+        }
+
+        [HttpGet]
+        public ActionResult GetEmployeeCount(int deptId)
+        {
+            try
+            {
+                Dept department = db.Depts.Find(deptId);
+                if (department != null)
+                {
+                    int employeeCount = department.Emps.Count;
+                    return Json(new { count = employeeCount }, JsonRequestBehavior.AllowGet);
+                }
+                else
+                {
+                    return HttpNotFound();
+                }
+            }
+            catch (Exception ex)
+            {
+                return Json(new { error = "An error occurred while retrieving the employee count." }, JsonRequestBehavior.AllowGet);
+            }
+        }
         protected override void Dispose(bool disposing)
         {
             if (disposing)

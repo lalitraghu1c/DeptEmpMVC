@@ -14,6 +14,18 @@ namespace EmpDeptTask.Controllers
     {
         private EmpDeptEntities db = new EmpDeptEntities();
 
+
+        public JsonResult CheckEmployeeNameExists(string empName)
+        {
+            var employee = db.Emps.FirstOrDefault(e => e.EmpName == empName);
+            if (employee != null)
+            {
+                string department = employee.Dept.DeptName;
+                return Json(new { exists = true, department = department }, JsonRequestBehavior.AllowGet);
+            }
+            return Json(new { exists = false }, JsonRequestBehavior.AllowGet);
+        }
+
         [HttpPost]
         public JsonResult SaveEmp(DeptVM data)
         {

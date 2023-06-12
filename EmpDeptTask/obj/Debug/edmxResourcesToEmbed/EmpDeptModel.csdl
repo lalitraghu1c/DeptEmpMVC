@@ -1,0 +1,45 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Schema Namespace="EmpDeptModel" Alias="Self" annotation:UseStrongSpatialTypes="false" xmlns:annotation="http://schemas.microsoft.com/ado/2009/02/edm/annotation" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm">
+  <EntityType Name="Dept">
+    <Key>
+      <PropertyRef Name="DeptId" />
+    </Key>
+    <Property Name="DeptId" Type="Int32" Nullable="false" />
+    <Property Name="DeptName" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+    <Property Name="DeptLocation" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+    <Property Name="DeptJoining" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+    <Property Name="DeptLeaving" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+    <NavigationProperty Name="Emps" Relationship="Self.FK__Emp__DeptId__50FB042B" FromRole="Dept" ToRole="Emp" />
+  </EntityType>
+  <EntityType Name="Emp">
+    <Key>
+      <PropertyRef Name="EmpId" />
+    </Key>
+    <Property Name="EmpId" Type="Int32" Nullable="false" />
+    <Property Name="EmpName" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+    <Property Name="EmpCity" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+    <Property Name="EmpState" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+    <Property Name="DeptId" Type="Int32" />
+    <NavigationProperty Name="Dept" Relationship="Self.FK__Emp__DeptId__50FB042B" FromRole="Emp" ToRole="Dept" />
+  </EntityType>
+  <Association Name="FK__Emp__DeptId__50FB042B">
+    <End Role="Dept" Type="Self.Dept" Multiplicity="0..1" />
+    <End Role="Emp" Type="Self.Emp" Multiplicity="*" />
+    <ReferentialConstraint>
+      <Principal Role="Dept">
+        <PropertyRef Name="DeptId" />
+      </Principal>
+      <Dependent Role="Emp">
+        <PropertyRef Name="DeptId" />
+      </Dependent>
+    </ReferentialConstraint>
+  </Association>
+  <EntityContainer Name="EmpDeptEntities" annotation:LazyLoadingEnabled="true">
+    <EntitySet Name="Depts" EntityType="Self.Dept" />
+    <EntitySet Name="Emps" EntityType="Self.Emp" />
+    <AssociationSet Name="FK__Emp__DeptId__50FB042B" Association="Self.FK__Emp__DeptId__50FB042B">
+      <End Role="Dept" EntitySet="Depts" />
+      <End Role="Emp" EntitySet="Emps" />
+    </AssociationSet>
+  </EntityContainer>
+</Schema>

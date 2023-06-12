@@ -18,6 +18,11 @@ namespace EmpDeptTask
                 url: "{controller}/{action}/{id}",
                 defaults: new { controller = "Home", action = "Index", id = UrlParameter.Optional }
             );
+            routes.MapRoute(
+                name: "ExportToExcel",
+                url: "Depts/ExportToExcel",
+                defaults: new { controller = "Depts", action = "ExportToExcel" }
+            );
         }
     }
 }

@@ -1,61 +1,67 @@
 ﻿
+<link href="https://cdn.datatables.net/1.13.4/css/jquery.dataTables.min.css" rel="stylesheet" />
 
 <div id="master_index">
     <br />
-    <div class="col-md-offset-2 col-md-10" style="position:relative;width:10vw">
-        <button type="button" class="btn btn-primary" id="createNewLink">Create New</button>
+    <div style="position:relative;margin-left:1px;width:10vw;display:flex;flex-direction:row;">
+        <div class="col-md-offset-2 col-md-10">
+            <button type="button" class="btn btn-primary" id="createNewLink">Create New</button>
+        </div>
+        <div class="col-md-offset-2 col-md-10">
+            <a href="@Url.Action("ExportToExcel", "Depts")" class="btn btn-primary">Export to Excel</a>
+        </div>
     </div>
+    <br />
 
-
-    <table class="table table-bordered">
+    <table id="departmentTable" class="table table-bordered">
         <thead>
             <tr>
                 <th>Department Name</th>
                 <th>Department Location</th>
                 <th>Department Joining</th>
                 <th>Department Leaving</th>
+                <th>Action</th>
             </tr>
         </thead>
-        <tbody data-bind="foreach: departments">
-            <tr>
-                <td><a data-bind="attr: { href: '/Depts/Edit?id=' + DeptId }, text: DeptName"></a></td>
-                <td data-bind="text: DeptLocation"></td>
-                <td data-bind="text: DeptJoining"></td>
-                <td data-bind="text: DeptLeaving"></td>
-            </tr>
-        </tbody>
     </table>
 </div>
 
 @section scripts{
+    <script src="~/Scripts/jquery-3.7.0.min.js"></script>
+    <script src="https://cdn.datatables.net/1.13.4/js/jquery.dataTables.min.js"></script>
     <script src="~/Scripts/knockout-3.5.1.js"></script>
-    <script>
 
+
+    <script>
         function DepartmentViewModel() {
             var self = this;
             self.departments = ko.observableArray([]);
 
-            self.loadDepartments = function () {
+            self.createNew = function () {
+                window.location.href = '/Emps/Create';
+            };
+
+            self.deleteDepartment = function (department) {
+                if (department.employeeCount > 0) {
+                    alert("Cannot delete the department. There are employees associated with it.");
+                    return;
+                }
+
                 $.ajax({
-                    url: '/Depts/fetchList',
-                    type: 'GET',
-                    contentType: "application/json; charset=utf-8",
-                    dataType: "json",
-                    success: function (data) {
-                        self.departments(data);
-                        //ko.mapping.fromJSON;
+                    url: '/Depts/Delete',
+                    type: 'POST',
+                    data: { id: department.DeptId },
+                    success: function (response) {
+                        if (confirm("Are you sure you want to delete this department?")) {
+                            self.departments.remove(department);
+                            window.location.href = 'Index';
+                        }
                     },
                     error: function (error) {
                         console.log(error);
                     }
                 });
             };
-
-            self.createNew = function () {
-                window.location.href = '/Emps/Create';
-            };
-
-            self.loadDepartments();
         }
 
         var viewModel = new DepartmentViewModel();
@@ -63,7 +69,64 @@
 
         document.getElementById('createNewLink').addEventListener('click', viewModel.createNew);
 
+        $(document).ready(function () {
+            $('#departmentTable').DataTable({
+                "ajax": {
+                    "url": "/Depts/GetServerData",
+                    "type": "post"
+                },
+                "serverSide": true,
+                "searchable": true,
+                "order": [[1, 'asc']],
+                "columns": [
+                    {
+                        "data": "DeptName",
+                        "autoWidth": true,
+                        "searchable": true,
+                        "render": function (data, type, row) {
+                            return '<a href="/Depts/Edit?id=' + row.DeptId + '">' + data + '</a>';
+                        }
+                    },
+                    {
+                        "data": "DeptLocation",
+                        "autoWidth": true,
+                        "searchable": true
+                    },
+                    {
+                        "data": "DeptJoining",
+                        "autoWidth": true,
+                        "searchable": true
+                    },
+                    {
+                        "data": "DeptLeaving",
+                        "autoWidth": true,
+                        "searchable": true
+                    },
+                    {
+                        "data": null,
+                        "render": function (data, type, row) {
+                            return '<button class="btn btn-danger deleteDepartment" data-id="' + row.DeptId + '">Delete</button>';
+                        }
+                    }
+                ]
+            });
 
-
+            $('#departmentTable').on('click', '.deleteDepartment', function () {
+                var deptId = $(this).data('id');
+                $.ajax({
+                    url: '/Depts/GetEmployeeCount',
+                    type: 'GET',
+                    data: { deptId: deptId },
+                    success: function (response) {
+                        var employeeCount = response.count;
+                        var department = { DeptId: deptId, employeeCount: employeeCount };
+                        viewModel.deleteDepartment(department);
+                    },
+                    error: function (error) {
+                        console.log(error);
+                    }
+                });
+            });
+        });
     </script>
 }
