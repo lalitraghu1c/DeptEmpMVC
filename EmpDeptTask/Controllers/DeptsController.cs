@@ -68,13 +68,15 @@ namespace EmpDeptTask.Controllers
                          }).ToList();
 
             // Filtering
-            if (!string.IsNullOrEmpty(param.sSearch))
+            string searchValue = Request["search[value]"];
+            if (!string.IsNullOrEmpty(searchValue))
             {
+                searchValue = searchValue.ToLower();
                 employees = employees.Where(x =>
-                    x.DeptName.ToLower().Contains(param.sSearch.ToLower()) ||
-                    x.DeptLocation.ToLower().Contains(param.sSearch.ToLower()) ||
-                    x.DeptJoining.ToLower().Contains(param.sSearch.ToLower()) ||
-                    x.DeptLeaving.ToString().Contains(param.sSearch.ToLower())
+                    x.DeptName.ToLower().Contains(searchValue) ||
+                    x.DeptLocation.ToLower().Contains(searchValue) ||
+                    x.DeptJoining.ToLower().Contains(searchValue) ||
+                    x.DeptLeaving.ToString().Contains(searchValue)
                 ).ToList();
             }
 

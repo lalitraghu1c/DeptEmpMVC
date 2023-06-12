@@ -3,18 +3,14 @@
 
 <div id="master_index">
     <br />
-    <div style="position:relative;margin-left:1px;width:10vw;display:flex;flex-direction:row;">
-        <div class="col-md-offset-2 col-md-10">
-            <button type="button" class="btn btn-primary" id="createNewLink">Create New</button>
-        </div>
-        <div class="col-md-offset-2 col-md-10">
-            <a href="@Url.Action("ExportToExcel", "Depts")" class="btn btn-primary">Export to Excel</a>
-        </div>
+    <div style="position:relative;margin-left:5px;width:18vw;display:flex;flex-direction:row;display:flex;flex-direction:row;justify-content:space-between">
+        <button type="button" class="btn btn-info" id="createNewLink">Create New</button>
+        <a href="@Url.Action("ExportToExcel", "Depts")" class="btn btn-info">Export to Excel</a>
     </div>
     <br />
 
-    <table id="departmentTable" class="table table-bordered">
-        <thead>
+    <table id="departmentTable" class="table table-bordered table-hover">
+        <thead style="background-color:aquamarine">
             <tr>
                 <th>Department Name</th>
                 <th>Department Location</th>
@@ -75,14 +71,17 @@
                     "url": "/Depts/GetServerData",
                     "type": "post"
                 },
-                "serverSide": true,
+                "processing": true,
+                "filter": true,
                 "searchable": true,
+                "searching": true,
+                "ordering": true,
+                "serverSide": true,
                 "order": [[1, 'asc']],
                 "columns": [
                     {
                         "data": "DeptName",
                         "autoWidth": true,
-                        "searchable": true,
                         "render": function (data, type, row) {
                             return '<a href="/Depts/Edit?id=' + row.DeptId + '">' + data + '</a>';
                         }
@@ -90,17 +89,14 @@
                     {
                         "data": "DeptLocation",
                         "autoWidth": true,
-                        "searchable": true
                     },
                     {
                         "data": "DeptJoining",
                         "autoWidth": true,
-                        "searchable": true
                     },
                     {
                         "data": "DeptLeaving",
                         "autoWidth": true,
-                        "searchable": true
                     },
                     {
                         "data": null,
